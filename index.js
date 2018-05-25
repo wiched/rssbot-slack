@@ -9,18 +9,24 @@ let rss = require("./rss.js");
 // The channels the bot is a member of
 const memberChannels = [];
 
+if (!process.env.BOT_OAUTH_TOKEN || !process.env.PORT) {
+  console.error(
+    "BOT_OAUTH_TOKEN or PORT environment variables not defined");
+  process.exit(1);
+}
+
 const controller = Botkit.slackbot({});
 
 // Connect to the Slack Real Time Messaging API
 const bot = controller.spawn({
-  token: 'xoxb-369884780625-371497392535-7AtDrx38mxaoJgxYoQ5MZkTG'
+  token: process.env.BOT_OAUTH_TOKEN
 }).startRTM();
 
 // Heroku shits the bed if it doesn't have something listening on the
 // port that it hands you in the PORT environment variable, so we spawn
 // a web server on it. This is also needed for receiving webhooks so
 // we set that up too.
-controller.setupWebserver(3400, function () {
+controller.setupWebserver(process.env.PORT, function () {
   controller.createWebhookEndpoints(controller.webserver);
 });
 
